@@ -1,6 +1,6 @@
 type: update
 name: Grafana
-baseUrl: https://raw.githubusercontent.com/rxfaelr/Jelastic-Grafana/main
+baseUrl: https://raw.githubusercontent.com/rxfaelr/Grafana-on-Jelastic/main
 skipNodeEmails: true
 
 onInstall:

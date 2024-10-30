@@ -1,6 +1,6 @@
 type: install
 name: Grafana
-baseUrl: https://raw.githubusercontent.com/rxfaelr/Jelastic-Grafana/main
+baseUrl: https://raw.githubusercontent.com/rxfaelr/Grafana-on-Jelastic/main
 logo: images/grafana_logo.png
 ssl: true
 homepage: https://grafana.com/
