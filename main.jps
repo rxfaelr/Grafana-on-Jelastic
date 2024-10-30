@@ -1,0 +1,90 @@
+type: install
+name: Grafana
+baseUrl: https://raw.githubusercontent.com/rxfaelr/Jelastic-Grafana/main
+logo: images/grafana_logo.png
+ssl: true
+homepage: https://grafana.com/
+description:
+  text: {en: "Grafana is a multi-platform open source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the web when connected to supported data sources, and it is expandable through a plug-in system. End users can create complex monitoring dashboards using interactive query builders.", pt: "O Grafana é uma aplicação Web de análise e visualização de métricas multiplataforma de código aberto. É possível criar tabelas, gráficos e outras visualizações quando ligado a fontes de dados compatíveis e é expansível através de um sistema de plug-ins. Os usuários podem criar painéis de controle complexos utilizando construtores de consultas interativas.", es: "Grafana es una aplicación web de análisis y visualización interactiva de código abierto multiplataforma. Proporciona diagramas, gráficos y alertas para la web cuando se conecta a fuentes de datos compatibles. Es ampliable mediante un sistema de plug-ins. Los usuarios finales pueden crear paneles de control complejos mediante constructores de consultas interactivos."}
+short: {en: "Grafana is one of the main applications for data observability, analysis and visualization.", pt: "Grafana é uma das principais aplicações para observabilidade, análise e visualização de dados.", es: "Grafana es una de las principales aplicaciones para la observabilidad, el análisis y visualización de datos."}
+
+categories:
+- apps/dev-and-admin-tools
+
+skipNodeEmails: true
+
+settings:
+  fields:
+  - name: version
+    type: list
+    caption: Versão
+    values:
+      OSS: Grafana OpenSource
+      ENTERPRISE: Grafana Enterprise
+    hideLabel: false
+    editable: false
+    required: true
+  - pack: ''
+    align: ''
+    defaultPadding: 5
+    defaultFlex: 0
+    caption: Compositefield
+    type: compositefield
+    name: compositefield
+    hideLabel: true
+    hidden: false
+
+nodes:
+  env:
+    JELASTIC_EXPOSE: 3000
+    JELASTIC_PORTS: 3000
+  nodeGroup: cp
+  fixedCloudlets: 4
+  cloudlets: 16
+  nodeType: nginxphp
+  skipEmail: true
+  displayName: Grafana
+  extip: ${settings.ssl:false}
+  isSLBAccessEnabled: true
+
+onInstall:
+- variables-modification
+- install-grafana
+- change-nginx-conf
+
+actions:
+  variables-modification:
+  - log: check variables and set them correctly
+  - if ('${settings.version}' === 'OSS'):
+      setGlobals:
+        GRAF-VER: grafana
+  - else:
+      setGlobals:
+        GRAF-VER: grafana-enterprise
+
+  install-grafana:
+  - log: Grafana
+  - install: ${baseUrl}/scripts/install-grafana.jps
+    settings:
+      GRAF-VER: ${globals.GRAF-VER}
+    skipEmail: true
+
+  change-nginx-conf:
+  - log: make nginx serve grafana over proxypass
+  - if ('${settings.ssl}' === 'false'):
+    - cmd[cp]: |-
+        sed -i '74d' /etc/nginx/nginx.conf
+        sed -i "74i proxy_pass http://localhost:3000/;"  /etc/nginx/nginx.conf
+      user: root
+  - else:
+    - cmd[cp]: |-
+        sed -i '74d' /etc/nginx/nginx.conf
+        sed -i "74i proxy_pass http://localhost:3000/;"  /etc/nginx/nginx.conf
+        sed -i '29d' /etc/nginx/conf.d/ssl.conf
+        sed -i "29i proxy_pass http://localhost:3000/;"  /etc/nginx/conf.d/ssl.conf
+      user: root
+  - api [cp]: jelastic.environment.control.RestartNodes
+
+success:
+  email: text/success-email.md
+  text: text/success-text.md
