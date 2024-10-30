@@ -2,4 +2,5 @@
 
 **Usuario**: admin  
 **Contraseña**: admin
+
 **(Se solicitará una nueva contraseña tras el primer acceso.)**
