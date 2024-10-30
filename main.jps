@@ -86,5 +86,13 @@ actions:
   - api [cp]: jelastic.environment.control.RestartNodes
 
 success:
-  email: text/success-email.md
-  text: text/success-text.md
+  email:
+    en: "text/email-en.md"
+    pt: "text/email-pt.md"
+    es: "text/email-es.md"
+  text:
+    en: "text/success-en.md"
+    pt: "text/success-pt.md"
+    es: "text/success-es.md"
+
+
